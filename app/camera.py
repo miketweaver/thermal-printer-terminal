@@ -68,6 +68,19 @@ async def _fetch_image(host: str, user: str, passwd: str,
     return resp.content
 
 
+async def _flash_off(host: str, user: str, passwd: str,
+                     client: httpx.AsyncClient) -> None:
+    """Turn the flash off, retrying up to 3 times on failure."""
+    for attempt in range(3):
+        try:
+            await _send_cmd(host, user, passwd, "Power Off", client, timeout=5.0)
+            return
+        except Exception as e:
+            logger.warning("Flash off attempt %d failed: %s", attempt + 1, e)
+            await asyncio.sleep(1.0)
+    logger.error("Could not turn flash off after 3 attempts")
+
+
 async def capture_photo() -> bytes:
     """
     Capture a JPEG from the ESP32-CAM.
@@ -96,20 +109,12 @@ async def capture_photo() -> bytes:
 
         # Capture JPEG
         try:
-            jpeg_data = await _fetch_image(host, user, passwd, client, timeout=15.0)
+            jpeg_data = await _fetch_image(host, user, passwd, client, timeout=60.0)
         except Exception as e:
-            # Turn flash off even if capture fails
-            try:
-                await _send_cmd(host, user, passwd, "Power Off", client, timeout=5.0)
-            except Exception:
-                pass
+            await _flash_off(host, user, passwd, client)
             raise CameraError(f"Photo capture failed: {e}")
 
-        # Turn flash off immediately after capture
-        try:
-            await _send_cmd(host, user, passwd, "Power Off", client, timeout=5.0)
-        except Exception as e:
-            logger.warning("Flash off failed: %s", e)
+        await _flash_off(host, user, passwd, client)
 
     if len(jpeg_data) < 100:
         raise CameraError("Captured image too small — camera may not be ready")
