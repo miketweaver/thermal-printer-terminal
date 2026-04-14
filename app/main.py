@@ -46,7 +46,7 @@ from app.web import PREFIX  # noqa: E402
 
 app.mount(f"{PREFIX}/static", StaticFiles(directory="app/static"), name="static")
 
-# Import and include page routers — all under /thermalprinter
+# Import and include page routers
 from app.pages import home, message, qso, emcomm, admin  # noqa: E402
 
 app.include_router(home.router, prefix=PREFIX)

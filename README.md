@@ -51,7 +51,7 @@ cp .env.example .env
 uvicorn app.main:app --host 0.0.0.0 --port 8080
 ```
 
-The app will be available at `http://localhost:8080/thermalprinter/`.
+The app will be available at `http://localhost:8080/thermalprinter/` (or whatever you set `URL_PREFIX` to).
 
 Jobs will queue as "failed" until a printer is reachable -- that's expected for local development.
 
@@ -97,6 +97,7 @@ All settings come from environment variables or a `.env` file:
 | `DATABASE_PATH` | `data/printqueue.db` | SQLite database path |
 | `MAX_QUEUE_SIZE` | `100` | Maximum queued jobs before rejecting |
 | `MAX_MESSAGE_LENGTH` | `1000` | Maximum message body characters |
+| `URL_PREFIX` | `/thermalprinter` | URL path prefix (`/thermalprinter`, `/printer`, or `/` for root) |
 
 Camera settings (host, credentials, enable/disable) are configured through the admin dashboard UI.
 
@@ -144,7 +145,7 @@ thermalprinter.service # systemd unit file
 
 All print endpoints accept standard `application/x-www-form-urlencoded` POST data. On success they return a `303` redirect (which browsers follow automatically). To use them programmatically with `curl`, add `-L` to follow the redirect or use `-o /dev/null` if you only care about the status code.
 
-All routes are prefixed with `/thermalprinter` by default.
+All routes are prefixed with `URL_PREFIX` (default `/thermalprinter`). Adjust the examples below if you changed it.
 
 ### Send a Message
 

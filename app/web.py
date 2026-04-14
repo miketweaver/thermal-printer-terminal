@@ -7,7 +7,9 @@ from itsdangerous import URLSafeTimedSerializer
 from app.config import settings
 from app.theme import resolve_client_display, callsign_from_hostname
 
-PREFIX = "/thermalprinter"
+# Normalize prefix: strip trailing slashes, "/" becomes "" so links like f"{P}/message" work
+_raw = settings.URL_PREFIX.strip().rstrip("/")
+PREFIX = _raw if _raw != "/" else ""
 
 _templates = Jinja2Templates(directory="app/templates")
 

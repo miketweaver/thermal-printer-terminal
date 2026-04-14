@@ -30,6 +30,7 @@ class Settings(BaseSettings):
 
     # App
     APP_VERSION: str = "1.0.0"
+    URL_PREFIX: str = "/thermalprinter"  # URL path prefix, e.g. "/thermalprinter", "/printer", or "/" for root
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
