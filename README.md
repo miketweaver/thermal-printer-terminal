@@ -140,6 +140,111 @@ deploy.sh              # rsync deploy script (Linux/macOS)
 thermalprinter.service # systemd unit file
 ```
 
+## API
+
+All print endpoints accept standard `application/x-www-form-urlencoded` POST data. On success they return a `303` redirect (which browsers follow automatically). To use them programmatically with `curl`, add `-L` to follow the redirect or use `-o /dev/null` if you only care about the status code.
+
+All routes are prefixed with `/thermalprinter` by default.
+
+### Send a Message
+
+```
+POST /thermalprinter/message
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `callsign` | yes | Your callsign (1-15 chars, alphanumeric) |
+| `body` | yes | Message text (max 1000 chars) |
+| `category` | no | `general` (default), `emergency`, `weather`, `net-control`, `info`, `social` |
+
+```bash
+curl -X POST http://your-node.local.mesh/thermalprinter/message \
+  -d "callsign=W1AW" \
+  -d "body=Hello from the mesh!" \
+  -d "category=general"
+```
+
+### Log a QSO
+
+```
+POST /thermalprinter/qso
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `callsign` | yes | Your callsign (1-15 chars, alphanumeric) |
+| `date` | yes | Date (e.g. `2025-07-04`) |
+| `time_utc` | yes | Time in UTC (e.g. `14:30`) |
+| `frequency` | yes | Frequency (e.g. `146.520 MHz`) |
+| `mode` | no | `SSB` (default), `FM`, `AM`, `CW`, `FT8`, `FT4`, `DMR`, `DSTAR`, `C4FM`, `RTTY`, `PSK31`, `JS8`, `WINLINK`, `OTHER` |
+| `station_worked` | no | Callsign of station worked (max 15 chars) |
+| `signal_sent` | no | RST sent (e.g. `59`) |
+| `signal_received` | no | RST received |
+| `notes` | no | Free text (max 500 chars) |
+
+```bash
+curl -X POST http://your-node.local.mesh/thermalprinter/qso \
+  -d "callsign=W1AW" \
+  -d "date=2025-07-04" \
+  -d "time_utc=14:30" \
+  -d "frequency=146.520 MHz" \
+  -d "mode=FM" \
+  -d "station_worked=W7ABC" \
+  -d "signal_sent=59" \
+  -d "signal_received=57"
+```
+
+### Submit an EmComm Form
+
+```
+POST /thermalprinter/emcomm/{template_type}
+```
+
+`template_type` is one of: `ics213`, `dyfi`, `sitrep`, `resource_request`
+
+Fields vary by template. All fields are submitted as flat form data using the field name directly.
+
+**ICS-213 General Message:**
+
+| Field | Required |
+|-------|----------|
+| `to_field` | yes |
+| `from_field` | yes |
+| `subject` | yes |
+| `date` | yes |
+| `time` | yes |
+| `body` | yes |
+| `incident_name` | no |
+| `msg_id` | no |
+| `precedence` | no (`Routine`, `Priority`, `Immediate`, `Flash`) |
+| `approved_by` | no |
+| `reply` | no |
+
+```bash
+curl -X POST http://your-node.local.mesh/thermalprinter/emcomm/ics213 \
+  -d "to_field=EOC" \
+  -d "from_field=W1AW" \
+  -d "subject=Status Update" \
+  -d "date=2025-07-04" \
+  -d "time=14:30" \
+  -d "body=All stations reporting normal operations."
+```
+
+**DYFI / ShakeOut Report:** `location`, `date`, `time`, `intensity` (1-10 Mercalli), `description`, `reporter` (required); `duration`, `damage`, `injuries` (optional)
+
+**Situation Report:** `reporting_station`, `dtg`, `situation_summary`, `reporter` (required); `period_from`, `period_to`, `resources_needed`, `casualties`, `infrastructure`, `next_report` (optional)
+
+**Resource Request:** `requesting_station`, `date`, `time`, `resource_type`, `quantity`, `priority`, `delivery_location`, `poc_name`, `justification` (required); `poc_contact` (optional)
+
+### Rate Limiting
+
+Print submissions are rate-limited per client IP. If you hit the limit you'll get a `200` response with the form re-rendered and a warning message. There is no `Retry-After` header -- just wait a bit.
+
+### Queue Full
+
+If the print queue is at capacity (`MAX_QUEUE_SIZE`, default 100), submissions return `200` with an error message instead of enqueueing.
+
 ## Printer Compatibility
 
 Built for the **Epson TM-m30III** but should work with any ESC/POS-compatible thermal receipt printer that accepts raw TCP connections on port 9100. The following ESC/POS commands are used:
