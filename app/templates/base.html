@@ -56,8 +56,13 @@
 document.querySelectorAll('.clickable').forEach(function(r){
   r.addEventListener('click',function(){
     var d=r.nextElementSibling;
-    if(d&&d.classList.contains('details-row'))
-      d.style.display=d.style.display==='none'?'':'none';
+    if(d&&d.classList.contains('details-row')){
+      var show=d.style.display==='none';
+      d.style.display=show?'':'none';
+      if(show)d.querySelectorAll('img[data-src]').forEach(function(img){
+        img.src=img.getAttribute('data-src');img.removeAttribute('data-src');
+      });
+    }
   });
 });
 </script>
