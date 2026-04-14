@@ -6,6 +6,7 @@ at a time since the printer is a single physical resource.
 """
 
 import asyncio
+import io
 import json
 import logging
 import os
@@ -51,6 +52,18 @@ async def _capture_proof_photo(job_id: int):
         await asyncio.sleep(1.5)
 
         jpeg_data = await capture_photo()
+        raw_size = len(jpeg_data)
+
+        # Re-encode to strip EXIF/metadata and optimize Huffman tables
+        try:
+            from PIL import Image
+            img = Image.open(io.BytesIO(jpeg_data))
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=85, optimize=True)
+            jpeg_data = buf.getvalue()
+        except Exception as e:
+            logger.debug("JPEG optimization skipped: %s", e)
+
         images_dir = os.path.join(os.path.dirname(settings.DATABASE_PATH) or ".", "images")
         os.makedirs(images_dir, exist_ok=True)
         path = os.path.join(images_dir, f"{job_id}.jpg")
@@ -59,7 +72,7 @@ async def _capture_proof_photo(job_id: int):
 
         await mark_job_has_image(job_id)
 
-        logger.info("Proof photo saved for job #%d (%d bytes)", job_id, len(jpeg_data))
+        logger.info("Proof photo saved for job #%d (%d -> %d bytes)", job_id, raw_size, len(jpeg_data))
 
     except CameraError as e:
         logger.warning("Proof photo failed for job #%d: %s", job_id, e)
