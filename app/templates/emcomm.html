@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}EmComm Forms{% endblock %}
+{% block content %}
+<p class="page-title">EmComm Forms</p>
+<p class="page-desc">When the internet is down and the grid is out, hardcopy still works. Pick a form and print.</p>
+
+<div class="cards">
+  {% for key, tmpl in templates.items() %}
+  <a class="card" href="{{ P }}/emcomm/{{ key }}">
+    <div class="card-title">
+      <span class="card-icon" style="background:#FFEBEE;color:#C62828">&#x1F4CB;</span>
+      {{ tmpl.name }}
+    </div>
+    <div class="card-desc">{{ tmpl.description }}</div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

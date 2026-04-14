@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Send a Message{% endblock %}
+{% block content %}
+<p class="page-title">Send a Message</p>
+<p class="page-desc">Type it here, print it there. Your message rolls off the receipt printer at the other end of the mesh.</p>
+
+<form method="post" action="{{ P }}/message" class="form-card">
+  <div class="field">
+    <label class="req">Callsign / Name</label>
+    <input name="callsign" value="{{ form.callsign or '' }}" placeholder="W1AW" maxlength="15" style="text-transform:uppercase" required>
+  </div>
+  <div class="field">
+    <label class="req">Message</label>
+    <textarea name="body" placeholder="Type your message here..." maxlength="1000" required>{{ form.body or '' }}</textarea>
+  </div>
+  <div class="field">
+    <label>Category</label>
+    <select name="category">
+      {% for val, label in categories %}
+      <option value="{{ val }}" {{ 'selected' if form.category == val else '' }}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">&#x1F5A8; Print Message</button>
+</form>
+{% endblock %}

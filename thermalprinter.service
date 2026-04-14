@@ -1,0 +1,14 @@
+[Unit]
+Description=Thermal Printer Terminal
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/thermalprinter
+ExecStart=/opt/thermalprinter/.venv/bin/python -u -m app.main
+Restart=always
+RestartSec=5
+EnvironmentFile=/opt/thermalprinter/.env
+
+[Install]
+WantedBy=multi-user.target

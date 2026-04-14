@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<p class="page-title">Admin Dashboard</p>
+
+<div class="stats-bar">
+  <span>Printer: {{ printer_host }}:{{ printer_port }}</span>
+  <span><strong>Queue: {{ queue_depth }}</strong></span>
+  <span>Done: {{ stats.done or 0 }} | Failed: {{ stats.failed or 0 }} | Queued: {{ stats.queued or 0 }}</span>
+</div>
+
+<div style="margin-bottom:16px;display:flex;gap:8px">
+  <form method="post" action="{{ P }}/admin/test-print" style="display:inline">
+    <button type="submit" class="btn btn-primary btn-sm">&#x1F5A8; Test Print</button>
+  </form>
+  <a href="{{ P }}/admin/logout" class="btn btn-danger btn-sm">Logout</a>
+</div>
+
+<div class="card cam-card" onclick="this.querySelector('.cam-body').classList.toggle('cam-hidden')" style="margin-bottom:16px;cursor:pointer">
+  <div class="card-title">
+    <span class="card-icon" style="background:#E3F2FD;color:#1565C0">&#x1F4F7;</span>
+    Camera Settings
+    <span style="margin-left:auto;font-size:13px;color:#999">{% if cam_enabled %}Enabled{% else %}Disabled{% endif %}</span>
+  </div>
+  <div class="card-desc">ESP32-CAM proof-of-print photo capture</div>
+  <div class="cam-body cam-hidden" onclick="event.stopPropagation()">
+    <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
+    <form method="post" action="{{ P }}/admin/camera">
+      <label class="cam-toggle"><input type="checkbox" name="cam_enabled" value="1" {{ 'checked' if cam_enabled else '' }}> Enable proof-of-print camera</label>
+      <div class="row" style="margin-top:10px">
+        <div class="field" style="flex:2 1 300px">
+          <label>Camera Host</label>
+          <input name="cam_host" value="{{ cam_host }}" placeholder="192.168.1.50 or hostname">
+        </div>
+        <div class="field" style="flex:1 1 140px">
+          <label>User</label>
+          <input name="cam_user" value="{{ cam_user }}" placeholder="optional" autocomplete="off">
+        </div>
+        <div class="field" style="flex:1 1 140px">
+          <label>Password</label>
+          <input name="cam_pass" type="password" value="{{ cam_pass }}" placeholder="optional" autocomplete="off">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        <button type="submit" formaction="{{ P }}/admin/camera/test" class="btn btn-flat btn-sm">Test Camera</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if jobs %}
+<table>
+  <thead>
+    <tr><th>#</th><th>Type</th><th>From</th><th>Status</th><th>Time</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for job in jobs %}
+    <tr class="clickable">
+      <td>{{ job.id }}</td>
+      <td>{{ job.job_type|capitalize }}</td>
+      <td>{{ job.from_display }}</td>
+      <td><span class="badge badge-{{ job.status }}">{{ job.status }}</span></td>
+      <td>{{ job.time }}</td>
+      <td>
+        <form method="post" style="display:inline" action="{{ P }}/admin/reprint/{{ job.id }}">
+          <button type="submit" class="btn btn-flat btn-sm" onclick="event.stopPropagation()">Reprint</button>
+        </form>
+        <form method="post" style="display:inline" action="{{ P }}/admin/delete/{{ job.id }}">
+          <button type="submit" class="btn btn-flat btn-sm" style="color:#C62828" onclick="event.stopPropagation()">Del</button>
+        </form>
+      </td>
+    </tr>
+    <tr class="details-row" style="display:none">
+      <td colspan="6">
+        <div class="details-inner">
+          {% for key, val in job.details %}
+          <div class="detail-pair">
+            <div class="detail-key">{{ key }}</div>
+            <div class="detail-val">{{ val }}</div>
+          </div>
+          {% endfor %}
+          {% if job.has_image %}
+          <div class="detail-pair">
+            <div class="detail-key">Proof Photo</div>
+            <div class="detail-val"><img src="{{ P }}/images/{{ job.id }}.jpg" class="proof-photo" alt="Proof of print"></div>
+          </div>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

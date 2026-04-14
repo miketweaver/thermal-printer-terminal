@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ template_name }}{% endblock %}
+{% block content %}
+<p class="page-title">{{ template_name }}</p>
+<p class="page-desc">{{ template_desc }}</p>
+
+<form method="post" action="{{ P }}/emcomm/{{ template_type }}" class="form-card">
+  {% for fd in fields %}
+  <div class="field">
+    <label{% if fd.required %} class="req"{% endif %}>{{ fd.label }}</label>
+    {% if fd.type == 'textarea' %}
+    <textarea name="{{ fd.name }}"{% if fd.required %} required{% endif %}>{{ form.get(fd.name, '') }}</textarea>
+    {% elif fd.type == 'select' %}
+    <select name="{{ fd.name }}"{% if fd.required %} required{% endif %}>
+      {% for opt in fd.options %}
+      <option value="{{ opt }}" {{ 'selected' if form.get(fd.name) == opt else '' }}>{{ opt }}</option>
+      {% endfor %}
+    </select>
+    {% else %}
+    <input name="{{ fd.name }}" value="{{ form.get(fd.name, '') }}"{% if fd.required %} required{% endif %}>
+    {% endif %}
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">&#x1F5A8; Print {{ template_name }}</button>
+</form>
+<p style="margin-top:12px"><a href="{{ P }}/emcomm" class="btn btn-flat">&larr; Back to EmComm Templates</a></p>
+{% endblock %}

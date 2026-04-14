@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Thermal Printer Terminal{% endblock %}</title>
+<link rel="stylesheet" href="{{ P }}/static/style.css">
+</head>
+<body>
+<header>
+  <div>
+    <div class="hdr-id">{{ callsign }}</div>
+    <div class="hdr-sub">MESH TERMINAL</div>
+  </div>
+  <nav>
+    <a href="{{ P }}/">Home</a>
+    <a href="{{ P }}/message">Message</a>
+    <a href="{{ P }}/qso">QSO</a>
+    <a href="{{ P }}/emcomm">EmComm</a>
+    <a href="{{ P }}/admin">Admin</a>
+  </nav>
+</header>
+
+<main>
+  {% if flash_msg %}
+  <div class="flash flash-{{ flash_type or 'success' }}">{{ flash_msg }}</div>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer>
+  {% if printer_online is not none %}
+    {% if printer_online %}
+      <span class="ft-online">&#x2714; Printer Online</span>
+    {% else %}
+      <span class="ft-offline">&#x2718; Printer Offline</span>
+    {% endif %}
+    {% if queue_depth %}
+      <span class="ft-queue">({{ queue_depth }} queued)</span>
+    {% endif %}
+    <span class="sep">|</span>
+  {% endif %}
+  <span>Thermal Printer Terminal v{{ version }}</span>
+  {% if client_display %}
+    <span class="sep">|</span>
+    <span>Connecting Client: {{ client_display }}</span>
+  {% endif %}
+  {% if is_admin %}
+    <span class="sep">|</span>
+    <span>Admin</span>
+    <a href="{{ P }}/admin/logout" style="color:#C62828">Logout</a>
+  {% endif %}
+</footer>
+
+<script>
+document.querySelectorAll('.clickable').forEach(function(r){
+  r.addEventListener('click',function(){
+    var d=r.nextElementSibling;
+    if(d&&d.classList.contains('details-row'))
+      d.style.display=d.style.display==='none'?'':'none';
+  });
+});
+</script>
+</body>
+</html>

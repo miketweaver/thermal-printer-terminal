@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}QSO / Contact Slip{% endblock %}
+{% block content %}
+<p class="page-title">QSO / Contact Slip</p>
+<p class="page-desc">Log a contact and print a slip. Fill in the details, hit print, and you've got hardcopy for the logbook.</p>
+
+<form method="post" action="{{ P }}/qso" class="form-card">
+  <div class="row">
+    <div class="field">
+      <label class="req">Your Callsign</label>
+      <input name="callsign" value="{{ form.callsign or '' }}" placeholder="W1AW" maxlength="15" style="text-transform:uppercase" required>
+    </div>
+    <div class="field">
+      <label>Station Worked</label>
+      <input name="station_worked" value="{{ form.station_worked or '' }}" placeholder="W7ABC" maxlength="15" style="text-transform:uppercase">
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label class="req">Date (UTC)</label>
+      <input name="date" value="{{ form.date or '' }}" required>
+    </div>
+    <div class="field">
+      <label class="req">Time (UTC)</label>
+      <input name="time_utc" value="{{ form.time_utc or '' }}" required>
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label class="req">Frequency</label>
+      <input name="frequency" value="{{ form.frequency or '' }}" placeholder="146.520 MHz" required>
+    </div>
+    <div class="field">
+      <label>Mode</label>
+      <select name="mode">
+        {% for m in modes %}
+        <option value="{{ m }}" {{ 'selected' if form.mode == m else '' }}>{{ m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label>RST Sent</label>
+      <input name="signal_sent" value="{{ form.signal_sent or '' }}" placeholder="59" maxlength="10">
+    </div>
+    <div class="field">
+      <label>RST Received</label>
+      <input name="signal_received" value="{{ form.signal_received or '' }}" placeholder="59" maxlength="10">
+    </div>
+  </div>
+  <div class="field">
+    <label>Notes</label>
+    <textarea name="notes" placeholder="QTH, weather, etc." maxlength="500">{{ form.notes or '' }}</textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">&#x1F5A8; Print QSO Slip</button>
+</form>
+{% endblock %}

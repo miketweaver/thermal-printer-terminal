@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Thermal Printer Terminal{% endblock %}
+{% block content %}
+<p class="page-title" style="margin-bottom:16px">Welcome{% if user_callsign %}, {{ user_callsign }}{% endif %}</p>
+
+<div class="cards">
+  <a class="card" href="{{ P }}/message">
+    <div class="card-title">
+      <span class="card-icon" style="background:#E3F2FD;color:#1565C0">&#x2709;</span>
+      Send a Message
+    </div>
+    <div class="card-desc">Drop a message on paper. It'll roll off the printer at the other end of the mesh.</div>
+  </a>
+  <a class="card" href="{{ P }}/qso">
+    <div class="card-title">
+      <span class="card-icon" style="background:#FFF3E0;color:#E65100">&#x1F4E1;</span>
+      Log a QSO
+    </div>
+    <div class="card-desc">Print a contact slip with callsign, freq, mode, and RST. Great for Field Day or a busy net.</div>
+  </a>
+  <a class="card" href="{{ P }}/emcomm">
+    <div class="card-title">
+      <span class="card-icon" style="background:#FFEBEE;color:#C62828">&#x1F4CB;</span>
+      EmComm Forms
+    </div>
+    <div class="card-desc">ICS-213, DYFI, SitRep, Resource Request &mdash; print hardcopy when you need it most.</div>
+  </a>
+</div>
+
+{% if recent %}
+<p class="page-title" style="font-size:20px">Traffic Log</p>
+<table>
+  <thead>
+    <tr><th>Type</th><th>From</th><th>Status</th><th>Time</th></tr>
+  </thead>
+  <tbody>
+    {% for job in recent %}
+    <tr class="clickable">
+      <td>{{ job.job_type|capitalize }}</td>
+      <td>{{ job.from_display }}</td>
+      <td><span class="badge badge-{{ job.status }}">{{ job.status }}</span></td>
+      <td>{{ job.time }}</td>
+    </tr>
+    <tr class="details-row" style="display:none">
+      <td colspan="4">
+        <div class="details-inner">
+          {% for key, val in job.details %}
+          <div class="detail-pair">
+            <div class="detail-key">{{ key }}</div>
+            <div class="detail-val">{{ val }}</div>
+          </div>
+          {% endfor %}
+          {% if job.has_image %}
+          <div class="detail-pair">
+            <div class="detail-key">Proof Photo</div>
+            <div class="detail-val"><img src="{{ P }}/images/{{ job.id }}.jpg" class="proof-photo" alt="Proof of print"></div>
+          </div>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty">
+  <div class="empty-icon">&#x1F4C4;</div>
+  <p><strong>No traffic yet.</strong></p>
+  <p>Send a message or log a QSO to get the printer rolling.</p>
+</div>
+{% endif %}
+{% endblock %}
