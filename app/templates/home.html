@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Thermal Printer Terminal{% endblock %}
 {% block content %}
-<p class="page-title" style="margin-bottom:16px">Welcome{% if user_callsign %}, {{ user_callsign }}{% endif %}</p>
+<p class="page-title" style="margin-bottom:4px">Welcome{% if user_callsign %}, {{ user_callsign }}{% endif %}</p>
+<p style="font-size:14px;color:#666;line-height:1.6;margin-bottom:16px">This is a proof-of-concept and I'm actively looking for feedback. If you have ideas for improvements, new features, or things that would make this more useful for your net or EmComm group, please <a href="https://github.com/miketweaver/thermal-printer-terminal/issues">open an issue</a> or reach out. 73 de KG7JZZ.</p>
 
 <div class="cards">
   <a class="card" href="{{ P }}/message">
@@ -69,6 +70,4 @@
   <p>Send a message or log a QSO to get the printer rolling.</p>
 </div>
 {% endif %}
-
-<p style="margin-top:24px;font-size:14px;color:#666;line-height:1.6">This is a proof-of-concept and I'm actively looking for feedback. If you have ideas for improvements, new features, or things that would make this more useful for your net or EmComm group, please <a href="https://github.com/miketweaver/thermal-printer-terminal/issues">open an issue</a> or reach out. 73 de KG7JZZ.</p>
 {% endblock %}
