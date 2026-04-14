@@ -4,6 +4,17 @@ A lightweight web app that lets users on an [AREDN](https://www.arednmesh.org/) 
 
 Built for amateur radio operators who want hardcopy messages, contact slips, and emergency communications forms at the push of a button.
 
+## Screenshots
+
+| | |
+|---|---|
+| ![Home page](docs/home.png) | ![Send a message](docs/message.png) |
+| Home page with feature cards and traffic log | Send a message to the printer |
+| ![EmComm forms](docs/emcomm.png) | ![ICS-213 form](docs/213-form.png) |
+| Emergency communications form templates | ICS-213 General Message form |
+| ![Admin dashboard](docs/admin.png) | ![Proof-of-print photo](docs/camera-verification.png) |
+| Admin dashboard with camera settings and job queue | ESP32-CAM proof-of-print verification |
+
 ## Features
 
 - **Send a Message** -- formatted text messages printed on receipt paper
