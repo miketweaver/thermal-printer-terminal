@@ -71,6 +71,8 @@ async def _fetch_image(host: str, user: str, passwd: str,
 async def _flash_off(host: str, user: str, passwd: str,
                      client: httpx.AsyncClient) -> None:
     """Turn the flash off, retrying up to 3 times on failure."""
+    # Brief pause — the ESP32 needs a moment after streaming the JPEG
+    await asyncio.sleep(0.5)
     for attempt in range(3):
         try:
             await _send_cmd(host, user, passwd, "Power Off", client, timeout=5.0)
